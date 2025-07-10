@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный календарь</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --container-bg: #ffffff;
+            --border-color: #ced4da;
+            --primary: #dc3545;
+            --primary-hover: #c82333;
+            --button-text: white;
+            --input-focus: rgba(220, 53, 69, 0.25);
+            --error-color: #dc3545;
+            --link-color: #6c757d;
+            --today-bg: rgba(220, 53, 69, 0.1);
+            --event-count-bg: rgba(220, 53, 69, 0.2);
+            --modal-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --border-color: #333;
+            --primary: #c82333;
+            --primary-hover: #dc3545;
+            --input-focus: rgba(200, 35, 51, 0.25);
+            --today-bg: rgba(200, 35, 51, 0.1);
+            --event-count-bg: rgba(200, 35, 51, 0.2);
+            --modal-bg: #1e1e1e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--primary);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--button-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .month-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-wrapper {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        .calendar-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+
+        .calendar-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            height: 100px;
+            vertical-align: top;
+            background-color: var(--container-bg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-table td:hover {
+            background-color: color-mix(in srgb, var(--container-bg) 90%, var(--primary));
+            transform: scale(1.02);
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .day-number {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .event-count {
+            font-size: 0.75rem;
+            color: var(--button-text);
+            background-color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: inline-block;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .today {
+            background-color: var(--today-bg);
+            border: 2px solid var(--primary);
+        }
+
+        .other-month {
+            opacity: 0.5;
+            background-color: color-mix(in srgb, var(--container-bg) 90%, var(--bg-color));
+        }
+
+        .event-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .event-preview {
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 3px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+        }
+
+        .event-form {
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .event-form h3 {
+            color: var(--primary);
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem var(--input-focus);
+        }
+
+        textarea.form-control {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            overflow: auto;
+            padding-top: 60px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--primary);
+        }
+
+        .event-item {
+            background-color: color-mix(in srgb, var(--container-bg) 90%, var(--primary));
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .event-item:hover {
+            transform: translateX(5px);
+        }
+
+        .event-item h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-item p {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-time {
+            font-weight: 500;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-time svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary);
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-add {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-add-btn {
+            padding: 0.5rem 1rem;
+            background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .quick-add-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-controls {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .calendar-table td {
+                height: 70px;
+                padding: 5px;
+                font-size: 0.8rem;
+            }
+
+            .day-number {
+                font-size: 0.8rem;
+            }
+
+            .event-preview {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-table th,
+            .calendar-table td {
+                padding: 2px;
+                height: 60px;
+                font-size: 0.7rem;
+            }
+
+            .day-number {
+                font-size: 0.7rem;
+            }
+
+            .event-count {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+            }
+
+            .month-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
+    <div class="container">
+        <div class="header">
+            <h1>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h2v2h2V6h6v2h2V6h2v2H5z"/>
+                </svg>
+                Личный Календарь
+            </h1>
+            <div class="user-controls">
+                <span style="color: var(--text-color);">Вы вошли как </span>
+                <strong style="color: var(--primary);">{{ username }}</strong>
+                <a href="/logout" class="btn btn-outline">Выйти</a>
+                <button onclick="window.location.href='/toggle_theme'" class="btn btn-outline">
+                    {{ '🌞 Светлая' if dark_mode else '🌙 Тёмная' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="month-navigation">
+            <h2 class="month-title">{{ month_name }} {{ year }}</h2>
+            <div class="nav-buttons">
+                <a href="/calendar?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline">&lt; Предыдущий</a>
+                <a href="/calendar?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline">Следующий &gt;</a>
+            </div>
+        </div>
+
+        <div class="event-form">
+            <h3>Создать новое событие</h3>
+            <form method="post" action="/add_event">
+                <div class="form-group">
+                    <label for="title">Название</label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Дата</label>
+                    <input type="date" id="date" name="date" class="form-control" required value="{{ today.strftime('%Y-%m-%d') }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Время (необязательно)</label>
+                    <input type="time" id="time" name="time" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description" name="description" class="form-control"></textarea>
+                </div>
+
+                <div class="quick-add">
+                    <button type="button" class="quick-add-btn" onclick="setQuickDate('today')">Сегодня</button>
+                    <button type="button" class="quick-add-btn" onclick="setQuickDate('tomorrow')">Завтра</button>
+                    <button type="button" class="quick-add-btn" onclick="setQuickDate('nextweek')">Через неделю</button>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Добавить событие</button>
+            </form>
+        </div>
+
+        <div class="calendar-wrapper">
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th>Пн</th>
+                        <th>Вт</th>
+                        <th>Ср</th>
+                        <th>Чт</th>
+                        <th>Пт</th>
+                        <th>Сб</th>
+                        <th>Вс</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in cal %}
+                    <tr>
+                        {% for day in week %}
+                            {% if day == 0 %}
+                                <td class="other-month"></td>
+                            {% else %}
+                                {% set date_str = '%04d-%02d-%02d' % (year, month, day) %}
+                                {% set events_today = user_events.get(date_str, []) %}
+                                {% set event_count = events_today|length %}
+                                {% set is_today = (day == today.day and month == today.month and year == today.year) %}
+                                <td class="{{ 'today' if is_today else '' }}" onclick="showEvents('{{ date_str }}')">
+                                    <div class="day-number">{{ day }}</div>
+                                    {% if event_count > 0 %}
+                                        <div class="event-count">{{ event_count }}</div>
+                                    {% endif %}
+                                    {% for event in events_today[:3] %}
+                                        <div class="event-preview">
+                                            <span class="event-dot"></span>{{ event.title }}
+                                        </div>
+                                    {% endfor %}
+                                    {% if events_today|length > 3 %}
+                                        <div class="event-preview">+ ещё {{ events_today|length - 3 }}</div>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+{% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Модальное окно для событий -->
+        <div id="eventsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div id="eventsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Показать события для выбранной даты
+        function showEvents(date) {
+            fetch(`/get_events/${date}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('eventsContent').innerHTML = html;
+                    document.getElementById('eventsModal').style.display = 'block';
+                });
+        }
+
+        // Закрыть модальное окно
+        function closeModal() {
+            document.getElementById('eventsModal').style.display = 'none';
+        }
+
+        // Закрыть при клике вне окна
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventsModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Быстрая установка даты
+        function setQuickDate(type) {
+            const dateInput = document.getElementById('date');
+            const today = new Date();
+            const newDate = new Date(today);
+
+            switch(type) {
+                case 'today':
+                    break;
+                case 'tomorrow':
+                    newDate.setDate(today.getDate() + 1);
+                    break;
+                case 'nextweek':
+                    newDate.setDate(today.getDate() + 7);
+                    break;
+            }
+
+            const formattedDate = newDate.toISOString().split('T')[0];
+            dateInput.value = formattedDate;
+        }
+
+        // Подсветка текущего дня при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const todayCells = document.querySelectorAll('.today');
+            if (todayCells.length > 0) {
+                todayCells[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+
+        // Анимация при добавлении события
+        function animateEventAddition(date) {
+            const dateStr = date.split('-').map(Number);
+            const cells = document.querySelectorAll('td');
+
+            cells.forEach(cell => {
+                const day = parseInt(cell.querySelector('.day-number')?.textContent);
+                if (day === dateStr[2]) {
+                    cell.style.animation = 'pulse 0.5s ease';
+                    setTimeout(() => {
+                        cell.style.animation = '';
+                    }, 500);
+                }
+            });
+        }
+
+        // Добавление CSS анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

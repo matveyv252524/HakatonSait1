@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный календарь - Главная</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --container-bg: #ffffff;
+            --border-color: #ced4da;
+            --primary: #dc3545;
+            --primary-hover: #c82333;
+            --button-text: white;
+            --link-color: #6c757d;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --border-color: #444;
+            --primary: #c82333;
+            --primary-hover: #dc3545;
+            --link-color: #adb5bd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(220, 53, 69, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: pulse 15s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.1; }
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        .tagline {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            opacity: 0.9;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.8s ease 0.6s both;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--button-text);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
+    <button onclick="window.location.href='/toggle_theme'" class="theme-toggle">
+        <span>{{ '🌞' if dark_mode else '🌙' }}</span>
+        <span>{{ 'Светлая' if dark_mode else 'Тёмная' }}</span>
+    </button>
+
+    <div class="hero">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h2v2h2V6h6v2h2V6h2v2H5z"/>
+            </svg>
+        </div>
+
+        <h1>Личный Календарь</h1>
+        <p class="tagline">Облегчите свою жизнь с нашим календарём. Планируйте события, напоминания и важные встречи в одном месте</p>
+
+        <div class="buttons">
+            <a href="/login" class="btn btn-primary">Войти</a>
+            <a href="/register" class="btn btn-outline">Зарегистрироваться</a>
+        </div>
+    </div>
+
+    <script>
+        // Плавное появление элементов при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            // Анимация уже реализована через CSS
+        });
+    </script>
+</body>
+</html>

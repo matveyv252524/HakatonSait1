@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Личный Календарь{% endblock %}</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #ff4444;
+            margin: 0;
+        }
+        .btn {
+            background-color: #ff4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background-color: #ff6666;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+        }
+        .logout-btn {
+            background-color: #333;
+        }
+        .logout-btn:hover {
+            background-color: #ff4444;
+        }
+        .error-message {
+            color: #ff9999;
+            margin: 20px 0;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Личный Календарь</h1>
+            {% if 'username' in session %}
+            <div>
+                <span style="color: #aaa;">Вы вошли как </span>
+                <strong style="color: #ff4444;">{{ session['username'] }}</strong>
+                <a href="/logout" class="btn logout-btn">Выйти</a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

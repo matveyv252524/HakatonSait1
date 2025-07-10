@@ -1,0 +1,18 @@
+<div style="background-color: var(--container-bg); padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto;">
+    <h3 style="color: var(--primary-color); margin-top: 0;">События на {{ date }}</h3>
+    {% if events %}
+        {% for event in events %}
+            <div style="background-color: color-mix(in srgb, var(--container-bg) 90%, var(--primary-color)); padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                <h4 style="margin-top: 0; color: var(--primary-color);">{{ event.title }}</h4>
+                <p style="margin-bottom: 5px;"><strong>Время:</strong> {{ event.time or 'Не указано' }}</p>
+                <p style="margin-bottom: 10px;">{{ event.description }}</p>
+                <div>
+                    <a href="/calendar?delete={{ event.id }}" style="display: inline-block; padding: 8px 15px; border-radius: 5px; text-decoration: none; margin-right: 10px; background-color: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color);">Удалить</a>
+                    <a href="/export/{{ event.id }}" style="display: inline-block; padding: 8px 15px; border-radius: 5px; text-decoration: none; color: var(--primary-color); border: 1px solid var(--primary-color); background-color: var(--container-bg);">Экспорт</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: var(--text-color); opacity: 0.7;">Нет событий на эту дату</p>
+    {% endif %}
+</div>

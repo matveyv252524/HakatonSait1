@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация в личном календаре</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --container-bg: #ffffff;
+            --border-color: #ced4da;
+            --primary: #dc3545;  /* Красный из Bootstrap */
+            --primary-hover: #c82333;
+            --button-text: white;
+            --input-focus: rgba(220, 53, 69, 0.25);
+            --error-color: #dc3545;
+            --link-color: #6c757d;
+            --success-color: #28a745;
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --border-color: #444;
+            --primary: #c82333;
+            --primary-hover: #dc3545;
+            --input-focus: rgba(200, 35, 51, 0.25);
+            --link-color: #adb5bd;
+            --success-color: #218838;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--primary);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem var(--input-focus);
+        }
+
+        .password-strength {
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            background: var(--error-color);
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .password-hints {
+            font-size: 0.8rem;
+            color: var(--link-color);
+            margin-top: 0.5rem;
+        }
+
+        .password-hints ul {
+            padding-left: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .password-hints .valid {
+            color: var(--success-color);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: var(--primary);
+            color: var(--button-text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .links {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .links a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--link-color);
+            cursor: pointer;
+        }
+
+        .requirements {
+            display: none;
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .requirements.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Анимация для кнопки */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-animate {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
+    <button onclick="window.location.href='/toggle_theme'" class="theme-toggle">
+        <span>{{ '🌞' if dark_mode else '🌙' }}</span>
+        <span>{{ 'Светлая' if dark_mode else 'Тёмная' }}</span>
+    </button>
+
+    <div class="register-container">
+        <div class="logo">
+            <!-- SVG иконка календаря -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h2v2h2V6h6v2h2V6h2v2H5z"/>
+            </svg>
+        </div>
+
+        <h1>Создать аккаунт</h1>
+
+        {% if error %}
+        <div style="color: var(--error-color); margin-bottom: 1rem; padding: 0.75rem; background-color: rgba(220, 53, 69, 0.1); border-radius: 8px; border-left: 4px solid var(--error-color);">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="registerForm">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Придумайте логин" required autofocus>
+                <div class="error-message" id="username-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email (необязательно)</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="example@mail.com">
+                <div class="error-message" id="email-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Не менее 8 символов" required>
+                    <button type="button" class="toggle-password" aria-label="Показать пароль">👁️</button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-meter" id="strength-meter"></div>
+                </div>
+                <div class="password-hints">
+                    <div id="password-hint-text">Надёжность пароля: <span id="strength-text">слабый</span></div>
+                    <div class="requirements" id="password-requirements">
+                        <p>Пароль должен содержать:</p>
+                        <ul>
+                            <li id="length-req">Минимум 8 символов</li>
+                            <li id="digit-req">Хотя бы одну цифру</li>
+                            <li id="letter-req">Хотя бы одну букву</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="error-message" id="password-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Подтвердите пароль</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" name="confirm-password" class="form-control" placeholder="Повторите пароль" required>
+                    <button type="button" class="toggle-password" aria-label="Показать пароль">👁️</button>
+                </div>
+                <div class="error-message" id="confirm-password-error"></div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-animate">Зарегистрироваться</button>
+            </div>
+        </form>
+
+        <div class="divider">Уже есть аккаунт?</div>
+
+        <div class="links">
+            <p><a href="/login">Войти в существующий аккаунт</a></p>
+            <p><a href="/">Вернуться на главную</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Показать/скрыть пароль
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+            });
+        });
+
+        // Проверка сложности пароля
+        const passwordInput = document.getElementById('password');
+        const strengthMeter = document.getElementById('strength-meter');
+        const strengthText = document.getElementById('strength-text');
+        const passwordRequirements = document.getElementById('password-requirements');
+
+        passwordInput.addEventListener('focus', () => {
+            passwordRequirements.classList.add('active');
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            if (passwordInput.value.length === 0) {
+                passwordRequirements.classList.remove('active');
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            let strength = 0;
+
+            // Проверка длины
+            if (password.length >= 8) {
+                strength += 1;
+                document.getElementById('length-req').classList.add('valid');
+            } else {
+                document.getElementById('length-req').classList.remove('valid');
+            }
+
+            // Проверка на цифры
+            if (/\d/.test(password)) {
+                strength += 1;
+                document.getElementById('digit-req').classList.add('valid');
+            } else {
+                document.getElementById('digit-req').classList.remove('valid');
+            }
+
+            // Проверка на буквы
+            if (/[a-zA-Z]/.test(password)) {
+                strength += 1;
+                document.getElementById('letter-req').classList.add('valid');
+            } else {
+                document.getElementById('letter-req').classList.remove('valid');
+            }
+
+            // Обновление индикатора
+            const width = (strength / 3) * 100;
+            strengthMeter.style.width = `${width}%`;
+
+            // Цвет и текст в зависимости от силы
+            if (password.length === 0) {
+                strengthMeter.style.background = 'transparent';
+                strengthText.textContent = '';
+            } else if (strength === 1) {
+                strengthMeter.style.background = 'var(--error-color)';
+                strengthText.textContent = 'слабый';
+            } else if (strength === 2) {
+                strengthMeter.style.background = '#ffc107';
+                strengthText.textContent = 'средний';
+            } else if (strength === 3) {
+                strengthMeter.style.background = 'var(--success-color)';
+                strengthText.textContent = 'сильный';
+            }
+        });
+
+        // Валидация формы
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Валидация логина
+            const username = document.getElementById('username').value.trim();
+            if (username.length < 3) {
+                document.getElementById('username-error').textContent = 'Логин должен содержать минимум 3 символа';
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                document.getElementById('username-error').textContent = 'Логин может содержать только буквы, цифры и _';
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('username-error').style.display = 'none';
+            }
+
+            // Валидация email (если заполнен)
+            const email = document.getElementById('email').value.trim();
+            if (email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('email-error').textContent = 'Введите корректный email';
+                document.getElementById('email-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('email-error').style.display = 'none';
+            }
+
+            // Валидация пароля
+            const password = document.getElementById('password').value;
+            if (password.length < 8) {
+                document.getElementById('password-error').textContent = 'Пароль должен содержать минимум 8 символов';
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            } else if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
+                document.getElementById('password-error').textContent = 'Пароль должен содержать буквы и цифры';
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+
+            // Проверка совпадения паролей
+            const confirmPassword = document.getElementById('confirm-password').value;
+            if (password !== confirmPassword) {
+                document.getElementById('confirm-password-error').textContent = 'Пароли не совпадают';
+                document.getElementById('confirm-password-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('confirm-password-error').style.display = 'none';
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+// Анимация ошибки
+                document.querySelectorAll('.error-message').forEach(el => {
+                    if (el.style.display === 'block') {
+                        el.parentElement.classList.add('shake-animation');
+                        setTimeout(() => {
+                            el.parentElement.classList.remove('shake-animation');
+                        }, 500);
+                    }
+                });
+            }
+        });
+
+        // Автофокус на поле логина при ошибке
+        {% if error %}
+        document.getElementById('username').focus();
+        {% endif %}
+
+        // CSS для анимации ошибки
+        const style = document.createElement('style');
+        style.textContent = `
+            .shake-animation {
+                animation: shake 0.5s;
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-5px); }
+                40%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

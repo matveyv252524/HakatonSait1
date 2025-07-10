@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в личный календарь</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --container-bg: #ffffff;
+            --border-color: #ced4da;
+            --primary: #dc3545;  /* Красный из Bootstrap */
+            --primary-hover: #c82333;
+            --button-text: white;
+            --input-focus: rgba(220, 53, 69, 0.25);
+            --error-color: #dc3545;
+            --link-color: #6c757d;
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --border-color: #444;
+            --primary: #c82333;
+            --primary-hover: #dc3545;
+            --input-focus: rgba(200, 35, 51, 0.25);
+            --link-color: #adb5bd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--primary);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem var(--input-focus);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: var(--primary);
+            color: var(--button-text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .links {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .links a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--link-color);
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Анимация для кнопки */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-animate {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
+    <button onclick="window.location.href='/toggle_theme'" class="theme-toggle">
+        <span>{{ '🌞' if dark_mode else '🌙' }}</span>
+        <span>{{ 'Светлая' if dark_mode else 'Тёмная' }}</span>
+    </button>
+
+    <div class="login-container">
+        <div class="logo">
+            <!-- SVG иконка календаря -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h2v2h2V6h6v2h2V6h2v2H5z"/>
+            </svg>
+        </div>
+
+        <h1>Вход в календарь</h1>
+
+        {% if error %}
+        <div style="color: var(--error-color); margin-bottom: 1rem; padding: 0.75rem; background-color: rgba(220, 53, 69, 0.1); border-radius: 8px; border-left: 4px solid var(--error-color);">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="loginForm">
+            <div class="form-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Введите ваш логин" required autofocus>
+                <div class="error-message" id="username-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Введите ваш пароль" required>
+                    <button type="button" class="toggle-password" aria-label="Показать пароль">👁️</button>
+                </div>
+                <div class="error-message" id="password-error"></div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-animate">Войти</button>
+            </div>
+        </form>
+
+        <div class="divider">или</div>
+
+        <div class="links">
+            <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+            <p><a href="/forgot-password">Забыли пароль?</a></p>
+            <p><a href="/">Вернуться на главную</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Показать/скрыть пароль
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+
+        // Валидация формы
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Валидация логина
+            const username = document.getElementById('username').value.trim();
+            if (username.length < 3) {
+                document.getElementById('username-error').textContent = 'Логин должен содержать минимум 3 символа';
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('username-error').style.display = 'none';
+            }
+
+            // Валидация пароля
+            const password = document.getElementById('password').value;
+            if (password.length < 6) {
+                document.getElementById('password-error').textContent = 'Пароль должен содержать минимум 6 символов';
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Автофокус на поле логина при ошибке
+        {% if error %}
+        document.getElementById('username').focus();
+        {% endif %}
+    </script>
+</body>
+</html>
